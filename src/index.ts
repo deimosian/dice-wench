@@ -5,10 +5,8 @@ import events from "./events";
 import {
   discordToken,
   logOutputChannel,
-  botListAuthKeys,
   clientID,
 } from "../config.json";
-const { discordbotlist, topgg } = botListAuthKeys;
 
 const scheduler = new ToadScheduler();
 
@@ -120,36 +118,8 @@ const startServer = () => {
       console.error(err);
     }
     events(discord, logOutputChannelTemp);
-
-    const task = new AsyncTask(
-      "botsite updates",
-      async () => {
-        const promises = [
-          axios.post(
-            `https://top.gg/api/bots/${clientID}/stats`,
-            {
-              server_count: discord.guilds.cache.size,
-            },
-            getHeaders(topgg)
-          ),
-          axios.post(
-            `https://discordbotlist.com/api/v1/bots/${clientID}/stats`,
-            {
-              guilds: discord.guilds.cache.size,
-            },
-            getHeaders(discordbotlist)
-          ),
-        ];
-        await Promise.all(promises);
-      },
-      (err: Error) => {
-        console.error(err);
-      }
-    );
-
-    const job = new SimpleIntervalJob({ hours: 4 }, task);
-    scheduler.addSimpleIntervalJob(job);
   });
   discord.login(discordToken);
 };
+
 startServer();
